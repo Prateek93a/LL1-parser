@@ -72,10 +72,10 @@ To clear the build files, execute:
 	 - Wrote functions for 
 		 - taking grammar input
 		 - eliminating left recursion
-		 - computing first and follow
-		 - building parse table
+		 - computing first
 		 - validating input strings based on the parse table
 		 
 - Premchandra Singh  [github@pcsingh](https://github.com/pcsingh)
 	- Wrote functions for
-		- computing first and follow
+		- computing follow
+        - computing the parse table
