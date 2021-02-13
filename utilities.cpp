@@ -82,7 +82,7 @@ void take_input(std::unordered_map<std::string, std::vector<std::vector<std::str
     }
 
     std::cout<<"What is the start symbol\n";
-    std::cin>>start;
+    std::cin>>start; // handle invalid start symbol error
 }
 
 
@@ -220,8 +220,7 @@ void find_follow(std::string non_terminal,
 }
 
 
-void find_non_terminal_to_index_map(std::unordered_map<std::string,
-                                     std::vector<std::vector<std::string>>> &grammar, 
+void find_non_terminal_to_index_map(std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar, 
                                      std::unordered_map<std::string, int> &non_terminal_to_index){
     int index = 0;
     for(auto &i: grammar){
@@ -230,8 +229,7 @@ void find_non_terminal_to_index_map(std::unordered_map<std::string,
     }
 }
 
-void find_terminal_to_index_map(std::unordered_map<std::string, 
-                                std::vector<std::vector<std::string>>> &grammar, 
+void find_terminal_to_index_map(std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar, 
                                 std::unordered_map<std::string, int> &terminal_to_index){
 
     std::unordered_set<std::string> terminals;

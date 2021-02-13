@@ -35,6 +35,8 @@ int main(){
     parse_table.assign(non_terminal_to_index.size(),
                     std::vector<std::vector<std::string>*>(terminal_to_index.size(),nullptr));
 
+
+    // check for errors
     for(auto &non_terminal_pair: non_terminal_to_index){
         for(auto &terminal_pair: terminal_to_index){
             int i = non_terminal_pair.second;
@@ -62,6 +64,18 @@ int main(){
                     if(production[0] == terminal){
                        parse_table[i][j] = &production;
                        break; 
+                    }else if(production[0] == "epsilon" && production.size() == 1){
+                        bool has_found = false;
+                        for(auto &symbol: follow[non_terminal]){
+                            if(symbol == terminal){
+                                has_found = true;
+                                break;
+                            }
+                        }
+                        if(has_found){
+                            parse_table[i][j] = &production;
+                            break;
+                        }
                     }
                 }
             }
@@ -87,23 +101,38 @@ int main(){
 
 
     std::cout<<"-----------Firsts-----------"<<std::endl;
-    for(auto i: grammar){
+      for(auto i: grammar){
         std::cout<<i.first<<" => ";
-        for(auto i: first[i.first]){
-            std::cout<<i<<" | ";
+        for(int j=0; j<first[i.first].size(); j++){
+            std::cout<<first[i.first][j];
+            if(j != first[i.first].size()-1){
+                std::cout<<", ";
+            }
         }
         std::cout<<std::endl;
     }
     std::cout<<"-------------------------------"<<std::endl;
 
-    //for(auto i: grammar){
-    //    std::cout<<"-----------Follows-----------"<<std::endl;
-    //    std::cout<<i.first<<" => ";
-    //    for(auto i: follow[i.first]){
-    //        std::cout<<i<<" | ";
-    //    }
-    //    std::cout<<std::endl;
-    //}
+
+    std::cout<<"-----------Follows-----------"<<std::endl;
+    for(auto i: grammar){
+        std::cout<<i.first<<" => ";
+        for(int j=0; j<follow[i.first].size(); j++){
+            std::cout<<follow[i.first][j];
+            if(j != follow[i.first].size()-1){
+                std::cout<<", ";
+            }
+        }
+        std::cout<<std::endl;
+    }
+    std::cout<<"-------------------------------"<<std::endl;
+
+
+    std::cout<<"-----------Parse Table-----------"<<std::endl;
+
+    
+
+    std::cout<<"-------------------------------"<<std::endl;
 
 
     while(true){
