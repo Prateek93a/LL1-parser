@@ -78,6 +78,7 @@ void take_input(std::unordered_map<std::string, std::vector<std::vector<std::str
     std::cout<<"How many production rules?"<<std::endl;
     std::cin>>num_rules;
 
+    std::cout<<"Enter the rules:"<<std::endl;
     while(num_rules--){
         std::string rule;
         std::getline(std::cin>>std::ws, rule);
@@ -89,6 +90,10 @@ void take_input(std::unordered_map<std::string, std::vector<std::vector<std::str
 
     std::cout<<"What is the start symbol\n";
     std::cin>>start; // handle invalid start symbol error
+    if(!grammar.count(start)){
+        std::cerr<<"Invalid start symbol\n";
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -310,12 +315,12 @@ void find_terminal_to_index_map(std::unordered_map<std::string, std::vector<std:
 
 void compute_parse_table(std::vector<std::vector<std::vector<std::string> *>> &parse_table,
                     std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar, 
-                 std::unordered_map<std::string, std::vector<std::string>> &first, 
-                std::unordered_map<std::string, std::vector<std::string>> &follow,
-                std::unordered_map<std::string, int> &non_terminal_to_index,
-                std::unordered_map<std::string, int> &terminal_to_index){
+                    std::unordered_map<std::string, std::vector<std::string>> &first, 
+                    std::unordered_map<std::string, std::vector<std::string>> &follow,
+                    std::unordered_map<std::string, int> &non_terminal_to_index,
+                    std::unordered_map<std::string, int> &terminal_to_index){
 
-         // check for errors
+    // check for errors
     for(auto &non_terminal_pair: non_terminal_to_index){
         for(auto &terminal_pair: terminal_to_index){
             int i = non_terminal_pair.second;
@@ -326,18 +331,19 @@ void compute_parse_table(std::vector<std::vector<std::vector<std::string> *>> &p
             for(auto &production: grammar[non_terminal]){
                 if(!production.size()) continue;
                 if(grammar.count(production[0])){
-                    // check if multiple productions lead to same terminal
-                    bool has_found = false;
+                    int count = 0;
                     for(auto &symbol: first[production[0]]){
                         if(symbol == terminal){
-                            has_found = true;
-                            break;
+                            count++;
                         }
                     }
 
-                    if(has_found){
+                    if(count == 1){
                         parse_table[i][j] = &production;
                         break;
+                    }else if(count > 1){
+                        std::cerr<<"Invalid grammar rules\n";
+                        exit(EXIT_FAILURE);
                     }
                 }else{
                     if(production[0] == terminal){
