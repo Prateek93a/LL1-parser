@@ -9,12 +9,11 @@ Here are listed all the methods used for building the project and the assumption
 ## Methods
 Following is a list of utility methods along with their functionality('`-> value`' denotes return type):
 
-<<<<<<< HEAD
 Assumptions:
 - Every symbol is capital letter(both terminal and non-terminal)
 - Every non-terminal is single character long
 - '@' is used as a epsilon 
-=======
+
 -  `take_input(grammar, start) -> void`
 	- takes in input an empty hashmap `grammar` and a string `start`
 	- prompts user to enter grammar rules and accordingly separate non terminals and production rules to store in the hashmap
@@ -81,8 +80,7 @@ To clear the build files, execute:
 		 - computing first
 		 - validating input strings based on the parse table
 		 
-- Premchandra Singh  [github@pcsingh](https://github.com/pcsingh)
+- Prem Chandra Singh  [github@pcsingh](https://github.com/pcsingh)
 	- Wrote functions for
 		- computing follow
         - computing the parse table
->>>>>>> ab6a2a4f9e3424e20ce9bf182f9bc9f52d511918
