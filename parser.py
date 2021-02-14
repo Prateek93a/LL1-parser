@@ -177,6 +177,9 @@ def follow(non_terminal, grammar, ans, first_dict):
 						ans[non_terminal] = ans[non_terminal].union(first_of_next)
     return ans
 
+def construct_parse_table():
+    pass
+
 
 # def find_first(grammar, first):
 #     non_terminals = [non_terminal for non_terminal in grammar]
@@ -198,29 +201,43 @@ print(grammar)
 eliminate_left_recursion(grammar)
 print(grammar)
 
-for non_terminal in grammar:
-    first_dict[non_terminal] = first(non_terminal, grammar)
-print(first_dict)
-
-for non_terminal in grammar:
-    follow_dict[non_terminal] = set()
-    follow_dict[non_terminal].union('$')
-
-for non_terminal in grammar:
-	follow_dict = follow(non_terminal, grammar, follow_dict, first_dict)
-print(follow_dict)
-
-
-
 convert_production_to_arr(grammar)
 print(grammar)
 
-find_first(grammar, first)
-print(first)
+# find_first(grammar, first)
+# print(first)
 
 non_terminals = [non_terminal for non_terminal in grammar]
 extract_terminals(grammar, terminals)
 
 parse_table = [['end'] * len(terminals)] * len(non_terminals)
 #construct_parse_table(parse_table, first, follow, grammar)
+
+#--------------------Calculation of First--------------------------
+print('\nFirst\n')
+for non_terminal in grammar:
+    first_dict[non_terminal] = first(non_terminal, grammar)
+
+for f in first_dict:
+	print(str(f) + " : " + str(first_dict[f]))
+print("")
+#-----------------------------------------------------------------
+
+#------------------Calculation of Follow--------------------------
+print('\nFollow\n')
+for non_terminal in grammar:
+    follow_dict[non_terminal] = set()
+    follow_dict[non_terminal].union('$')
+
+for non_terminal in grammar:
+	follow_dict = follow(non_terminal, grammar, follow_dict, first_dict)
+
+for f in follow_dict:
+	print(str(f) + " : " + str(follow_dict[f]))
+#----------------------------------------------------------------
+
+#-----------------Parser Table-----------------------------------
+
+
+
 
