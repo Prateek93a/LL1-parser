@@ -89,13 +89,67 @@ int main(){
     std::cout<<"-------------------------------"<<std::endl;
 
 
-    std::cout<<"-----------Parse Table-----------"<<std::endl;
+    //std::cout<<"-----------Parse Table-----------"<<std::endl;
+    // this is unfinished and part of future work
 
+    //int max_size = 0;
+    //int columns = terminal_to_index.size() + 1;
+    //int rows = non_terminal_to_index.size() + 1;
+    //for(auto &i: grammar){
+    //    if(max_size < i.second.size()){
+    //        max_size = i.second.size();
+    //    }
+    //}
+    //max_size += 2;
     
+    //for(int j=0; j<columns; j++){
+    //    for(int k=0; k<max_size; k++){
+    //        std::cout<<"_";
+    //    }
+    //}
+    //std::cout<<std::endl;
+    //for(int i=0; i<rows; i++){
+    //    std::cout<<"|";
+    //    for(int j=0; j<max_size-2; j++){
+    //        std::cout<<" ";
+    //    }
+    //    std::cout<<"|";
 
-    std::cout<<"-------------------------------"<<std::endl;
+    //    if(i == 0){
+    //        for(auto &terminal: terminal_to_index){
+    //            std::cout<<terminal.first;
+    //            for(int j=0; j<(max_size-(int)terminal.first.size()-2); j++){
+    //                std::cout<<" ";
+    //            }
+    //            std::cout<<"|";
+    //        }
+    //    }else{
+    //        for(int j=0; j<terminal_to_index.size(); j++){
+    //            std::vector<std::string> *rule= parse_table[i-1][j];
+    //            for(auto &symbol: (*rule)){
+    //                if(symbol == "epsilon"){
+    //                    std::cout<<"#";
+    //                }else{
+    //                    std::cout<<symbol;
+    //                }
+    //            }
+    //            for(int k=0; k<(max_size-(int)(*rule).size()-2); k++){
+    //                std::cout<<" ";
+    //            }
+    //            std::cout<<"|";
+    //        }
+    //    }
+    //    std::cout<<std::endl;
+    //    for(int j=0; j<columns; j++){
+    //        for(int k=0; k<max_size; k++){
+    //            std::cout<<"_";
+    //        }
+    //    }
+    //    std::cout<<std::endl;
+    //}
 
-    // error recovery
+
+    //std::cout<<"-------------------------------"<<std::endl;
 
     while(true){
         std::cout<<"Enter the string, type 'end' to break\n";
@@ -103,7 +157,6 @@ int main(){
         std::getline(std::cin>>std::ws, input);
         if(input == "end") break;
         std::string scanned_input = scan(input);
-        std::cout<<scanned_input<<std::endl;
 
         parse_stack.push("$");
         parse_stack.push(start);

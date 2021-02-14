@@ -4,7 +4,7 @@ This project is a LL(1) parser that takes in grammar rules as input, based on wh
 During the execution, it also checks if the grammar rules provided are valid and based on LL(1) parsing or not.
 
 # Description
-Here are listed all the methods used for building the project and the assumptions made.
+Here are listed all the methods used for building the project and the assumptions made. Also, sample execution of the program is provided for reference. We first wrote most of the Python and then ported to C++.
 
 ## Methods
 Following is a list of utility methods along with their functionality('`-> value`' denotes return type):
@@ -45,15 +45,77 @@ Following is a list of helper functions that proved useful for carrying out abov
 	- takes in input hashmap `grammar` and `non_terminal_to_index` and fills the latter with key-value pairs where key is non terminal and value is an index
 	- this hashmap is useful for indexing into the parse table based on non terminal value
 - `find_terminal_to_index_map(grammar, terminal_to_index) -> void`
-- 	- takes in input hashmap `grammar` and `terminal_to_index` and fills the latter with key-value pairs where key is terminal and value is an index
-	- this hashmap is useful for indexing into the parse table based on terminal value
+	- takes in input hashmap `grammar` and `terminal_to_index` and fills the latter with key-value pairs where key is terminal and value is an index
+    - this hashmap is useful for indexing into the parse table based on terminal value
 
 ## Assumptions
-Following assumptions were made while writing the code, which could not be eliminated due to lack of time but are part of future work:
+Following assumptions were made while writing the code, which we tried to eliminate but ran out of time, but are part of future work:
 
 - The grammar rule strings are of the form `non_terminal : production`. Whitespaces between the entities is allowed.
 - Non terminals are uppercase and single lettered. Terminals are either lowercase single lettered characters or special characters, except '`$`'
 - `#` represents epsilon
+
+## Sample Execution
+```
+How many production rules?
+9
+Enter the rules:
+E: E + T
+E: E - T
+E: T
+T: T * F
+T: T / F
+T: F
+F: n
+F: i
+F: (E)
+What is the start symbol
+E
+-----------Productions-----------
+E' => +TE' | -TE' | epsilon
+T' => *FT' | /FT' | epsilon
+F => n | i | (E)
+T => FT'
+E => TE'
+-------------------------------
+-----------Firsts-----------
+E' => epsilon, -, +
+T' => epsilon, /, *
+F => (, i, n
+T => n, i, (
+E => (, i, n
+-------------------------------
+-----------Follows-----------
+E' => $, )
+T' => -, +, $, )
+F => *, /, -, $, +, )
+T => $, +, -, )
+E => $, )
+-------------------------------
+Enter the string, type 'end' to break
+36 * + 49
+String accepted
+Enter the string, type 'end' to break
+36 / -49
+String accepted
+Enter the string, type 'end' to break
+abc + 50
+String accepted
+Enter the string, type 'end' to break
+abc - def
+String accepted
+Enter the string, type 'end' to break
++ abc + 90
+String accepted
+Enter the string, type 'end' to break
+abc /
+Invalid string
+Enter the string, type 'end' to break
+90 -
+Invalid string
+Enter the string, type 'end' to break
+end
+```
 
 # Running Locally
 Execute the following commands in sequence:
@@ -68,15 +130,19 @@ To clear the build files, execute:
 
 
 # Contributors
- - Prateek Jain [github@prateek93a](https://github.com/Prateek93a)
-	 - Ported the code to C++
-	 - Wrote functions for 
-		 - taking grammar input
-		 - eliminating left recursion
-		 - computing first
-		 - validating input strings based on the parse table
+- Prateek Jain [github@prateek93a](https://github.com/Prateek93a)
+	- Wrote functions for 
+		- taking grammar input
+		- eliminating left recursion
+		- computing follow
+		- computing parse table
+		- validating input strings based on the parse table
+	- Worked on Readme
 		 
 - Prem Chandra Singh  [github@pcsingh](https://github.com/pcsingh)
 	- Wrote functions for
+	    - taking grammar input
+		- computing first
 		- computing follow
-        - computing the parse table
+        - printing first, follow and productions
+	- Worked on Readme
