@@ -9,10 +9,6 @@ Here are listed all the methods used for building the project and the assumption
 ## Methods
 Following is a list of utility methods along with their functionality('`-> value`' denotes return type):
 
-Assumptions:
-- Every symbol is capital letter(both terminal and non-terminal)
-- Every non-terminal is single character long
-- '@' is used as a epsilon 
 
 -  `take_input(grammar, start) -> void`
 	- takes in input an empty hashmap `grammar` and a string `start`
