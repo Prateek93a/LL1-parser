@@ -23,65 +23,26 @@ int main(){
 
 
     follow[start].push_back("$");
-    for(auto &i: grammar){
-        if(!follow.count(i.first)){
-            find_follow(i.first, grammar, follow, first);
+    bool has_updated = true;
+    int temp = 0;
+
+    while(has_updated){
+        has_updated = false;
+        for(auto &i: grammar){
+            has_updated |= find_follow(i.first, grammar, follow, first);
         }
+        temp++;
     }
-    
+
     find_non_terminal_to_index_map(grammar, non_terminal_to_index);
     find_terminal_to_index_map(grammar, terminal_to_index);
 
     parse_table.assign(non_terminal_to_index.size(),
                     std::vector<std::vector<std::string>*>(terminal_to_index.size(),nullptr));
 
-
     // check for errors
-    for(auto &non_terminal_pair: non_terminal_to_index){
-        for(auto &terminal_pair: terminal_to_index){
-            int i = non_terminal_pair.second;
-            int j = terminal_pair.second;
-            std::string non_terminal = non_terminal_pair.first;
-            std::string terminal = terminal_pair.first;
-
-            for(auto &production: grammar[non_terminal]){
-                if(!production.size()) continue;
-                if(grammar.count(production[0])){
-                    // check if multiple productions lead to same terminal
-                    bool has_found = false;
-                    for(auto &symbol: first[production[0]]){
-                        if(symbol == terminal){
-                            has_found = true;
-                            break;
-                        }
-                    }
-
-                    if(has_found){
-                        parse_table[i][j] = &production;
-                        break;
-                    }
-                }else{
-                    if(production[0] == terminal){
-                       parse_table[i][j] = &production;
-                       break; 
-                    }else if(production[0] == "epsilon" && production.size() == 1){
-                        bool has_found = false;
-                        for(auto &symbol: follow[non_terminal]){
-                            if(symbol == terminal){
-                                has_found = true;
-                                break;
-                            }
-                        }
-                        if(has_found){
-                            parse_table[i][j] = &production;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+    compute_parse_table(parse_table, grammar, first, follow, non_terminal_to_index, terminal_to_index);
+  
 
     std::cout<<"-----------Productions-----------"<<std::endl;
     for(auto i: grammar){
@@ -128,71 +89,71 @@ int main(){
     std::cout<<"-------------------------------"<<std::endl;
 
 
-    std::cout<<"-----------Parse Table-----------"<<std::endl;
+    //std::cout<<"-----------Parse Table-----------"<<std::endl;
 
     
 
-    std::cout<<"-------------------------------"<<std::endl;
+    //std::cout<<"-------------------------------"<<std::endl;
 
 
-    while(true){
-        std::cout<<"Enter the string, type 'end' to break\n";
-        std::string input;
-        std::getline(std::cin>>std::ws, input);
-        if(input == "end") break;
-        std::string scanned_input = scan(input);
-        std::cout<<scanned_input<<std::endl;
+    //while(true){
+    //    std::cout<<"Enter the string, type 'end' to break\n";
+    //    std::string input;
+    //    std::getline(std::cin>>std::ws, input);
+    //    if(input == "end") break;
+    //    std::string scanned_input = scan(input);
+    //    std::cout<<scanned_input<<std::endl;
 
-        parse_stack.push("$");
-        parse_stack.push(start);
-        bool is_not_valid = false;
-        int current_index = 0;
+    //    parse_stack.push("$");
+    //    parse_stack.push(start);
+    //    bool is_not_valid = false;
+    //    int current_index = 0;
 
-        while(!parse_stack.empty()){
-            std::string current_symbol = "";
-            current_symbol.push_back(scanned_input[current_index]);
-            std::string current_stack_symbol = parse_stack.top();
+    //    while(!parse_stack.empty()){
+    //        std::string current_symbol = "";
+    //        current_symbol.push_back(scanned_input[current_index]);
+    //        std::string current_stack_symbol = parse_stack.top();
 
-            if(current_stack_symbol == current_symbol){
-                parse_stack.pop();
-                current_index++;
-            }else if(grammar.count(current_stack_symbol)){
-                if(!terminal_to_index.count(current_symbol)){
-                    is_not_valid = true;
-                    while(!parse_stack.empty()){
-                        parse_stack.pop();
-                    }
-                    continue;
-                }
-                int non_terminal_index = non_terminal_to_index[current_stack_symbol];
-                int terminal_index = terminal_to_index[current_symbol];
+    //        if(current_stack_symbol == current_symbol){
+    //            parse_stack.pop();
+    //            current_index++;
+    //        }else if(grammar.count(current_stack_symbol)){
+    //            if(!terminal_to_index.count(current_symbol)){
+    //                is_not_valid = true;
+    //                while(!parse_stack.empty()){
+    //                    parse_stack.pop();
+    //                }
+    //                continue;
+    //            }
+    //            int non_terminal_index = non_terminal_to_index[current_stack_symbol];
+    //            int terminal_index = terminal_to_index[current_symbol];
 
-                if(parse_table[non_terminal_index][terminal_index] != nullptr){
-                    parse_stack.pop();
-                    std::vector<std::string> *match = parse_table[non_terminal_index][terminal_index];
-                    for(int i=(*match).size()-1; i>=0; i--){
-                        parse_stack.push((*match)[i]);
-                    }
-                }
-                else{
-                    is_not_valid = true;
-                    while(!parse_stack.empty()){
-                        parse_stack.pop();
-                    }
-                }
-            }else{
-                is_not_valid = true;
-                while(!parse_stack.empty()){
-                    parse_stack.pop();
-                }
-            }
-        }
+    //            if(parse_table[non_terminal_index][terminal_index] != nullptr){
+    //                parse_stack.pop();
+    //                std::vector<std::string> *match = parse_table[non_terminal_index][terminal_index];
+    //                for(int i=(*match).size()-1; i>=0; i--){
+    //                    parse_stack.push((*match)[i]);
+    //                }
+    //            }
+    //            else{
+    //                is_not_valid = true;
+    //                while(!parse_stack.empty()){
+    //                    parse_stack.pop();
+    //                }
+    //            }
+    //        }else{
+    //            is_not_valid = true;
+    //            while(!parse_stack.empty()){
+    //                parse_stack.pop();
+    //            }
+    //        }
+    //    }
 
-        if(is_not_valid){
-            std::cerr<<"Invalid string \n";
-        }else{
-            std::cout<<"String accepted \n";
-        }
-    }
+    //    if(is_not_valid){
+    //        std::cerr<<"Invalid string \n";
+    //    }else{
+    //        std::cout<<"String accepted \n";
+    //    }
+    //}
 
 }

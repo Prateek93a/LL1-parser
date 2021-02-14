@@ -21,8 +21,12 @@ Following is a list of utility methods along with their functionality('`-> value
 	- takes in input a `non_terminal` string, hashmap `grammar` and hashmap `first` and computes the first terminals for the `non_terminals`
 - `find_follow(non_terminal, grammar, follow, first) -> void`
 	- takes in input a `non_terminal` string, hashmap `grammar`, hashmap `follow` and hashmap `first` and computes the follow terminals for the `non_terminals`
-- `compute_parse_table(parse_table, grammar, first, follow) -> void`
+- `compute_parse_table(parse_table, grammar, first, follow, non_terminal_to_index, terminal_to_index) -> void`
 	- takes in input 2-D matrix `parse_table`, `non_terminal` string, hashmap `grammar`, hashmap `follow` and hashmap `first` and computes the parse table
+- `scan(input) -> string`
+	- takes in input string which is the input given by user for checking the validity based on grammar rules
+	- it converts the numerical part in the input to `n` and alphabetical parts to `i`, denoting `num` and `id` tokens which makes it easier for performing ll(1) parsing on the input
+	- it returns the transformed input string
 
 Following is a list of helper functions that proved useful for carrying out above tasks:
 
@@ -35,10 +39,6 @@ Following is a list of helper functions that proved useful for carrying out abov
 - `convert_to_arr(production) -> array`
 	- takes in input extracted production string and breaks it into array of individual symbols comprising of terminals and non terminals
 	- it returns this array
-- `scan(input) -> string`
-	- takes in input string which is the input given by user for checking the validity based on grammar rules
-	- it converts the numerical part in the input to `n` and alphabetical parts to `i`, denoting `num` and `id` tokens which makes it easier for performing ll(1) parsing on the input
-	- it returns the transformed input string
 - `check_left_recursion(non_terminal, productions) -> bool`
 	- takes in input string `non_terminal` and 2-D matrix `productions` and returns true if left recursion exists, false otherwise
 - `find_non_terminal_to_index_map(grammar, non_terminal_to_index) -> void`

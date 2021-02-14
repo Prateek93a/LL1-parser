@@ -31,7 +31,13 @@ std::vector<std::string> convert_to_arr(std::string &production_string){
     std::vector<std::string> production_arr;
     for(char c: production_string){
         std::string symbol = "";
-        symbol.push_back(c);
+        if(c == '#'){
+            if(production_string.length() == 1) symbol.append("epsilon");
+            else continue;
+        }else{
+            symbol.push_back(c);
+        }
+        
         production_arr.push_back(symbol);
     }
 
@@ -153,41 +159,82 @@ void find_first(std::string non_terminal,
 }
 
 
-void find_follow_helper_helper(std::unordered_set<std::string> &follow_terminals_set, std::vector<std::string> &production, int i,
-          std::string &non_terminal, std::string &next_non_terminal,
-           std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar,
-                                              std::unordered_map<std::string, std::vector<std::string>> &first){
-                                             
+bool find_follow_helper(std::unordered_set<std::string> &follow_terminals_set, 
+                        std::vector<std::string> &production, int i,
+                        std::string &left_non_terminal, std::string &non_terminal,
+                        std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar,
+                        std::unordered_map<std::string, std::vector<std::string>> &first,
+                        std::unordered_map<std::string, std::vector<std::string>> &follow){
+
+    bool has_updated = false;
+                      
     if(i == production.size()){
-        // handle end of rule, handle recursion case
-        if(non_terminal == next_non_terminal) return;
-        for(auto &symbol: find_follow_helper(non_terminal, grammar, first)){
-            follow_terminals_set.insert(symbol);
-        }
-    }else if(grammar.count(production[i])){
-        // handle first of non terminal
-        bool has_epsilon = false;
-        for(auto &terminal: first[production[i]]){
-            if(terminal != "epsilon"){
-                follow_terminals_set.insert(terminal);
-            }else{
-                has_epsilon = true;
+        if(non_terminal == left_non_terminal || !follow.count(left_non_terminal)) return has_updated;
+        for(auto &symbol: follow[left_non_terminal]){
+            if(!follow_terminals_set.count(symbol)){
+                follow_terminals_set.insert(symbol);
+                has_updated = true;
             }
         }
-        //if(has_epsilon){
-        //    find_follow_helper_helper(follow_terminals_set, production, i+1, next_non_terminal, grammar, first);
-        //}
-    }else{
-        follow_terminals_set.insert(production[i]);
     }
+    else if(grammar.count(production[i])){
+        bool has_epsilon = true;
+        while(i < production.size() && has_epsilon && grammar.count(production[i])){
+            has_epsilon = false;
+            for(auto &terminal: first[production[i]]){
+                if(terminal != "epsilon"){
+                    if(!follow_terminals_set.count(terminal)){
+                        follow_terminals_set.insert(terminal);
+                        has_updated = true;
+                    }
+                }else{
+                    has_epsilon = true;
+                }
+            }
+            i++;
+        }
+
+        if(has_epsilon){
+            if(i == production.size()){
+                if(!follow.count(left_non_terminal)) return has_updated;
+                  for(auto &symbol: follow[left_non_terminal]){
+                    if(!follow_terminals_set.count(symbol)){
+                        follow_terminals_set.insert(symbol);
+                        has_updated = true;
+                    }
+                }
+            }else{
+                if(!follow_terminals_set.count(production[i])){
+                    follow_terminals_set.insert(production[i]);
+                    has_updated = true;
+                }
+            }
+        }
+    }
+    else{
+        if(!follow_terminals_set.count(production[i])){
+            follow_terminals_set.insert(production[i]);
+            has_updated = true;
+        }
+    }
+
+    return has_updated;
 }
 
 
-std::vector<std::string> find_follow_helper(std::string non_terminal,
-                                             std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar,
-                                              std::unordered_map<std::string, std::vector<std::string>> &first){
+bool find_follow(std::string non_terminal,
+                std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar,
+                 std::unordered_map<std::string, std::vector<std::string>> &follow,
+                 std::unordered_map<std::string, std::vector<std::string>> &first){
 
     std::unordered_set<std::string> follow_terminals_set;
+    bool has_updated = false;
+    
+    if(follow.count(non_terminal)){
+        for(auto &i: follow[non_terminal]) {
+            follow_terminals_set.insert(i);
+        }
+    }
 
     for(auto &rule: grammar){
         for(auto &production: rule.second){
@@ -198,25 +245,34 @@ std::vector<std::string> find_follow_helper(std::string non_terminal,
                 }
                 i++;
             }
-            std::string next_non_terminal = rule.first;
+            if(i == production.size()) continue;
 
-            find_follow_helper_helper(follow_terminals_set, production, i+1, next_non_terminal, non_terminal, grammar, first);        
+            std::string left_non_terminal = rule.first;
+
+            has_updated |= find_follow_helper(follow_terminals_set, production, i+1, left_non_terminal, non_terminal, grammar, first, follow);        
         }
     }
 
-    std::vector<std::string> follow_terminals_vector;
-    for(auto &symbol: follow_terminals_set) follow_terminals_vector.push_back(symbol);
-    return follow_terminals_vector; 
-}
+    if(has_updated){
+        for(auto &symbol: follow_terminals_set) {
+            bool contains = false;
+            if(follow.count(non_terminal)){
+                for(auto &i: follow[non_terminal]){
+                    if(i == symbol){
+                        contains = true;
+                        break;
+                    }
+                }
+            }
 
+            if(!contains){
+                follow[non_terminal].push_back(symbol);
+            }
+        }
+    }
 
-void find_follow(std::string non_terminal,
-                std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar,
-                 std::unordered_map<std::string, std::vector<std::string>> &follow,
-                 std::unordered_map<std::string, std::vector<std::string>> &first){
-
+    return has_updated;
     
-
 }
 
 
@@ -249,4 +305,59 @@ void find_terminal_to_index_map(std::unordered_map<std::string, std::vector<std:
         index++;
     }
     terminal_to_index["$"] = index;
+}
+
+
+void compute_parse_table(std::vector<std::vector<std::vector<std::string> *>> &parse_table,
+                    std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar, 
+                 std::unordered_map<std::string, std::vector<std::string>> &first, 
+                std::unordered_map<std::string, std::vector<std::string>> &follow,
+                std::unordered_map<std::string, int> &non_terminal_to_index,
+                std::unordered_map<std::string, int> &terminal_to_index){
+
+         // check for errors
+    for(auto &non_terminal_pair: non_terminal_to_index){
+        for(auto &terminal_pair: terminal_to_index){
+            int i = non_terminal_pair.second;
+            int j = terminal_pair.second;
+            std::string non_terminal = non_terminal_pair.first;
+            std::string terminal = terminal_pair.first;
+
+            for(auto &production: grammar[non_terminal]){
+                if(!production.size()) continue;
+                if(grammar.count(production[0])){
+                    // check if multiple productions lead to same terminal
+                    bool has_found = false;
+                    for(auto &symbol: first[production[0]]){
+                        if(symbol == terminal){
+                            has_found = true;
+                            break;
+                        }
+                    }
+
+                    if(has_found){
+                        parse_table[i][j] = &production;
+                        break;
+                    }
+                }else{
+                    if(production[0] == terminal){
+                       parse_table[i][j] = &production;
+                       break; 
+                    }else if(production[0] == "epsilon" && production.size() == 1){
+                        bool has_found = false;
+                        for(auto &symbol: follow[non_terminal]){
+                            if(symbol == terminal){
+                                has_found = true;
+                                break;
+                            }
+                        }
+                        if(has_found){
+                            parse_table[i][j] = &production;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }               
 }
