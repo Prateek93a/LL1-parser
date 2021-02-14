@@ -132,17 +132,19 @@ To clear the build files, execute:
 # Contributors
 - Prateek Jain [github@prateek93a](https://github.com/Prateek93a)
 	- Wrote functions for 
-		- taking grammar input
+		- taking grammar input(colab)
 		- eliminating left recursion
-		- computing follow
+		- computing follow(colab)
 		- computing parse table
 		- validating input strings based on the parse table
 	- Worked on Readme
 		 
 - Prem Chandra Singh  [github@pcsingh](https://github.com/pcsingh)
 	- Wrote functions for
-	    - taking grammar input
+	    - taking grammar input(colab)
 		- computing first
-		- computing follow
+		- computing follow(colab)
         - printing first, follow and productions
 	- Worked on Readme
+
+(`(colab)` indicates that the worked was done collaboratively on the respective functions)
