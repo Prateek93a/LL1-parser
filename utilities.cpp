@@ -62,7 +62,8 @@ std::string scan(std::string &input){
                 i++;
             }
             scanned_input.push_back('i');
-        }else{
+        }
+        else{
             scanned_input.push_back(input[i]);
             i++;
         }
@@ -89,7 +90,7 @@ void take_input(std::unordered_map<std::string, std::vector<std::vector<std::str
     }
 
     std::cout<<"What is the start symbol\n";
-    std::cin>>start; // handle invalid start symbol error
+    std::cin>>start;
     if(!grammar.count(start)){
         std::cerr<<"Invalid start symbol\n";
         exit(EXIT_FAILURE);
@@ -254,7 +255,9 @@ bool find_follow(std::string non_terminal,
 
             std::string left_non_terminal = rule.first;
 
-            has_updated |= find_follow_helper(follow_terminals_set, production, i+1, left_non_terminal, non_terminal, grammar, first, follow);        
+            has_updated |= find_follow_helper(follow_terminals_set,
+                                             production, i+1, left_non_terminal,
+                                              non_terminal, grammar, first, follow);        
         }
     }
 
@@ -312,6 +315,12 @@ void find_terminal_to_index_map(std::unordered_map<std::string, std::vector<std:
     terminal_to_index["$"] = index;
 }
 
+void check_for_error(int count){
+    if(count > 1){
+        std::cerr<<"Invalid grammar rules\n";
+        exit(EXIT_FAILURE);
+    }
+}
 
 void compute_parse_table(std::vector<std::vector<std::vector<std::string> *>> &parse_table,
                     std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar, 
@@ -327,28 +336,29 @@ void compute_parse_table(std::vector<std::vector<std::vector<std::string> *>> &p
             int j = terminal_pair.second;
             std::string non_terminal = non_terminal_pair.first;
             std::string terminal = terminal_pair.first;
+            int count = 0;
 
             for(auto &production: grammar[non_terminal]){
                 if(!production.size()) continue;
                 if(grammar.count(production[0])){
-                    int count = 0;
+                    bool has_found = false;
                     for(auto &symbol: first[production[0]]){
                         if(symbol == terminal){
-                            count++;
+                            has_found = true;
+                            break;
                         }
                     }
 
-                    if(count == 1){
+                    if(has_found){
+                        count++;
+                        check_for_error(count);
                         parse_table[i][j] = &production;
-                        break;
-                    }else if(count > 1){
-                        std::cerr<<"Invalid grammar rules\n";
-                        exit(EXIT_FAILURE);
                     }
                 }else{
                     if(production[0] == terminal){
-                       parse_table[i][j] = &production;
-                       break; 
+                        count++;
+                        check_for_error(count);
+                        parse_table[i][j] = &production; 
                     }else if(production[0] == "epsilon" && production.size() == 1){
                         bool has_found = false;
                         for(auto &symbol: follow[non_terminal]){
@@ -358,8 +368,10 @@ void compute_parse_table(std::vector<std::vector<std::vector<std::string> *>> &p
                             }
                         }
                         if(has_found){
+                            count++;
+                            check_for_error(count);
                             parse_table[i][j] = &production;
-                            break;
+
                         }
                     }
                 }

@@ -9,3 +9,17 @@ F : n
 F:i
 F :(E)
 E
+
+///////////////////////////
+
+9
+S : A
+S : B
+A : b
+B : BACb
+B : a
+C : AD
+C : #
+D : BC
+D : bC
+S

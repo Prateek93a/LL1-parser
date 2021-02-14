@@ -19,8 +19,10 @@ Following is a list of utility methods along with their functionality('`-> value
 	- if left recursion exists, it eliminates it and introduces new non terminals and updates the production rules
 - `find_first(non_terminal, grammar, first) -> void`
 	- takes in input a `non_terminal` string, hashmap `grammar` and hashmap `first` and computes the first terminals for the `non_terminals`
-- `find_follow(non_terminal, grammar, follow, first) -> void`
+- `find_follow(non_terminal, grammar, follow, first) -> bool`
 	- takes in input a `non_terminal` string, hashmap `grammar`, hashmap `follow` and hashmap `first` and computes the follow terminals for the `non_terminals`
+	- it returns true if there is an update in the `follow` hashmap, false otherwise
+	- the reason for returning boolean value is that we wanted to compute follow iteratively and stop only when there is no more updates to the `follow` hashmap to avoid infinite recursion
 - `compute_parse_table(parse_table, grammar, first, follow, non_terminal_to_index, terminal_to_index) -> void`
 	- takes in input 2-D matrix `parse_table`, `non_terminal` string, hashmap `grammar`, hashmap `follow` and hashmap `first` and computes the parse table
 - `scan(input) -> string`
@@ -41,6 +43,9 @@ Following is a list of helper functions that proved useful for carrying out abov
 	- it returns this array
 - `check_left_recursion(non_terminal, productions) -> bool`
 	- takes in input string `non_terminal` and 2-D matrix `productions` and returns true if left recursion exists, false otherwise
+- `find_follow_helper(follow_terminals_set, production, i, left_non_terminal, non_terminal, grammar, first, follow) -> bool`
+	- useful for finding out the follow of current `non_terminal` based on next symbol in production rule
+	- if there is no symbol on the right, then it uses follow of `left_non_terminal` to compute the follow of current `non_terminal`
 - `find_non_terminal_to_index_map(grammar, non_terminal_to_index) -> void`
 	- takes in input hashmap `grammar` and `non_terminal_to_index` and fills the latter with key-value pairs where key is non terminal and value is an index
 	- this hashmap is useful for indexing into the parse table based on non terminal value
