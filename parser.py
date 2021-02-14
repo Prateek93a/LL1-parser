@@ -55,9 +55,75 @@ def eliminate_left_recursion(grammar):
             grammar[non_terminal] = [new_rule]
 
             
-def first(grammar):
-    non_terminals = [non_terminal for non_terminal in grammar]
+def first(non_terminal, grammar):
+    """This function returns the first of the non_terminal from grammer.
+    Here '@' is the representation of epsilon.
 
+    Args:
+        non_terminal (String): It the non-terminal part from the grammer dictionary.
+        grammar (Dictionary): Its keys are non_terminal and values are the list of the production from non_terminal
+
+    Returns:
+        ans [Set]: It contains the first of corresponding non_terminal
+    """
+    c = non_terminal[0]
+    ans = set()
+    if c.isupper():
+	    for st in grammar[c]:
+			if st == '@':				
+				if len(non_terminal)!=1 :
+					ans = ans.union(first(non_terminal[1:], grammar))
+				else:
+					ans = ans.union('@')
+			else:
+				f = first(st, grammar)
+				ans = ans.union(x for x in f)
+    else:
+		ans = ans.union(c)
+    return ans
+
+def follow(non_terminal, grammar, ans, first_dict):
+    """This function return the dictionary of follow for each non_terminal.
+
+    Args:
+        non_terminal (String): [description]
+        grammar (Dictionary): Its keys are non_terminal and values are the list of the production from non_terminal
+        ans (Dictionary): Empty dictionary where Keys are non_terminal and values are the set of follow for 
+                            corresponding non_terminal
+        first_dict (Dictionary): Dictionary with keys are non_terminal and values are the set which contains
+                                the first of corresponding non_terminal
+
+    Returns:
+        ans (Dictionary): With Keys are non_terminal and values are the set of follow for 
+                            corresponding non_terminal
+    """
+
+    for key in grammar:
+		for value in grammar[key]:
+			f = value.find(non_terminal)
+			if f != -1:
+				if f == (len(value)-1):
+					if key != non_terminal:
+						if key in ans:
+							temp = ans[key]
+						else:
+							ans = follow(key, grammar, ans, first_dict)
+							temp = ans[key]
+						ans[non_terminal] = ans[non_terminal].union(temp)
+				else:
+					first_of_next = first_dict[value[f+1:]]
+					if '@' in first_of_next:
+						if key != non_terminal:
+							if key in ans:
+								temp = ans[key]
+							else:
+								ans = follow(key, grammar, ans, first_dict)
+								temp = ans[key]
+							ans[non_terminal] = ans[non_terminal].union(temp)
+							ans[non_terminal] = ans[non_terminal].union(first_of_next) - {'@'}
+					else:
+						ans[non_terminal] = ans[non_terminal].union(first_of_next)
+    return ans
 
 
 grammar = {}
@@ -68,3 +134,14 @@ print(grammar)
 eliminate_left_recursion(grammar)
 print(grammar)
 
+for non_terminal in grammar:
+    first_dict[non_terminal] = first(non_terminal, grammar)
+print(first_dict)
+
+for non_terminal in grammar:
+    follow_dict[non_terminal] = set()
+    follow_dict[non_terminal].union('$')
+
+for non_terminal in grammar:
+	follow_dict = follow(non_terminal, grammar, follow_dict, first_dict)
+print(follow_dict)

@@ -12,3 +12,4 @@ Todo:
 Assumptions:
 - Every symbol is capital letter(both terminal and non-terminal)
 - Every non-terminal is single character long
+- '@' is used as a epsilon 
