@@ -52,17 +52,17 @@ std::string scan(std::string &input){
             i++;
             continue;
         }  
-        if(input[i] >= '0' && input[i] <= '9'){
-            while(i < input.size() && input[i] >= '0' && input[i] <= '9'){
-                i++;
-            }
-            scanned_input.push_back('n');
-        }else if((input[i] >= 'a' && input[i] <= 'z') || (input[i] >= 'A' && input[i] <= 'Z')){
-            while(i < input.size() && (input[i] >= 'a' && input[i] <= 'z') || (input[i] >= 'A' && input[i] <= 'Z')){
-                i++;
-            }
-            scanned_input.push_back('i');
-        }
+        //if(input[i] >= '0' && input[i] <= '9'){
+        //    while(i < input.size() && input[i] >= '0' && input[i] <= '9'){
+        //        i++;
+        //    }
+        //    scanned_input.push_back('n');
+        //}else if((input[i] >= 'a' && input[i] <= 'z') || (input[i] >= 'A' && input[i] <= 'Z')){
+        //    while(i < input.size() && (input[i] >= 'a' && input[i] <= 'z') || (input[i] >= 'A' && input[i] <= 'Z')){
+        //        i++;
+        //    }
+        //    scanned_input.push_back('i');
+        //}
         else{
             scanned_input.push_back(input[i]);
             i++;
@@ -141,27 +141,57 @@ void eliminate_left_recursion(std::unordered_map<std::string, std::vector<std::v
 }
 
 
-void find_first(std::string non_terminal, 
+bool find_first(std::string non_terminal, 
                 std::unordered_map<std::string, std::vector<std::vector<std::string>>> &grammar,
                 std::unordered_map<std::string, std::vector<std::string>> &first){
 
+    bool has_updated = false;
     std::unordered_set<std::string> first_terminals_set;
+
+    if(first.count(non_terminal)){
+        for(auto &i: first[non_terminal]) {
+            first_terminals_set.insert(i);
+        }
+    }
+
     for(auto &production: grammar[non_terminal]){
         if(!grammar.count(production[0])){
-            first_terminals_set.insert(production[0]);
+            if(!first_terminals_set.count(production[0])){
+                first_terminals_set.insert(production[0]);
+                has_updated = true;
+            }  
         }else{
-            if(!first.count(production[0])){
-                find_first(production[0], grammar, first);
-            }
-            for(auto &symbol: first[production[0]]){
-                first_terminals_set.insert(symbol);
+            if(first.count(production[0])){
+                for(auto &symbol: first[production[0]]){
+                      if(!first_terminals_set.count(symbol)){
+                        first_terminals_set.insert(symbol);
+                        has_updated = true;
+                    }  
+                }
             }
         }
     }
 
-    for(auto &symbol: first_terminals_set) {
-        first[non_terminal].push_back(symbol);
-    } 
+
+    if(has_updated){
+        for(auto &symbol: first_terminals_set) {
+            bool contains = false;
+            if(first.count(non_terminal)){
+                for(auto &i: first[non_terminal]){
+                    if(i == symbol){
+                        contains = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!contains){
+                first[non_terminal].push_back(symbol);
+            }
+        }
+    }
+
+    return has_updated;
 }
 
 

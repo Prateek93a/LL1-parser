@@ -31,11 +31,18 @@ int main(){
     }
     std::cout<<"-------------------------------"<<std::endl;
 
-    for(auto &i: grammar){
-        if(!first.count(i.first)){
-            find_first(i.first, grammar, first);
+    bool has_updated = true;
+    while(has_updated){
+        has_updated = false;
+        for(auto &i: grammar){
+            has_updated |= find_first(i.first, grammar, first);
         }
     }
+    //for(auto &i: grammar){
+    //    if(!first.count(i.first)){
+    //        find_first(i.first, grammar, first);
+    //    }
+    //}
 
     std::cout<<"-----------Firsts-----------"<<std::endl;
       for(auto i: grammar){
@@ -51,15 +58,15 @@ int main(){
     std::cout<<"-------------------------------"<<std::endl;
 
     follow[start].push_back("$");
-    bool has_updated = true;
-    int temp = 0;
+    has_updated = true;
+    //int temp = 0;
 
     while(has_updated){
         has_updated = false;
         for(auto &i: grammar){
             has_updated |= find_follow(i.first, grammar, follow, first);
         }
-        temp++;
+        //temp++;
     }
 
 
